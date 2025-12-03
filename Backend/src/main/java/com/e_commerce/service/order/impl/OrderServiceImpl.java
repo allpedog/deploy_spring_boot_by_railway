@@ -93,6 +93,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(total);
         order.setUserInformation(userInformation);
         order.setNote(orderCreateForm.getNote());
+        order.setRestaurant(selectedCartItems.get(0).getProduct().getRestaurant());
 
         order = ordersRepository.save(order);
 
@@ -102,6 +103,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderItems(orderItems);
 
         order = ordersRepository.save(order);
+        cartItemsService.deleteAllCartItemsByAccountId();
         return ordersMapper.convertEntityToDTO(order);
     }
 
@@ -181,8 +183,8 @@ public class OrderServiceImpl implements OrderService {
             case IN_PROGRESS -> {
                 emailService.sendOrderStatusEmail(OrderStatus.IN_PROGRESS, order.getAccount().getEmail(), order.getAccount().getAccountName(), String.valueOf(order.getId()), order.getTotalPrice());
             }
-            case COMPLETED -> {
-                emailService.sendOrderStatusEmail(OrderStatus.COMPLETED, order.getAccount().getEmail(), order.getAccount().getAccountName(), String.valueOf(order.getId()), order.getTotalPrice());
+            case DELIVERED -> {
+                emailService.sendOrderStatusEmail(OrderStatus.DELIVERED, order.getAccount().getEmail(), order.getAccount().getAccountName(), String.valueOf(order.getId()), order.getTotalPrice());
             }
             case REJECTED -> {
                 emailService.sendOrderStatusEmail(OrderStatus.REJECTED, order.getAccount().getEmail(), order.getAccount().getAccountName(), String.valueOf(order.getId()), order.getTotalPrice());
@@ -199,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus oldStatus = order.getOrderStatus();
 
         // Không cho sửa trạng thái khi đơn đã hoàn tất hoặc huỷ
-        if (oldStatus == OrderStatus.COMPLETED || oldStatus == OrderStatus.CANCELLED) {
+        if (oldStatus == OrderStatus.DELIVERED || oldStatus == OrderStatus.CANCELLED) {
             throw new CustomException(ErrorResponse.ORDER_STATUS_NOT_ALLOWED);
         }
 
@@ -234,7 +236,7 @@ public class OrderServiceImpl implements OrderService {
 
         switch (oldStatus) {
             case PLACED -> {
-                if (newStatus == OrderStatus.COMPLETED)
+                if (newStatus == OrderStatus.DELIVERED)
                     throw new CustomException(ErrorResponse.ORDER_STATUS_NOT_ALLOWED);
             }
             case CONFIRMED -> {

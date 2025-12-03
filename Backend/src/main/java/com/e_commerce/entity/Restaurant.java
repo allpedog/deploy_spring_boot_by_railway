@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -27,7 +26,11 @@ public class Restaurant {
 
     private Boolean active = true;
 
-    private String address;
+    @Column(name = "lat")
+    private Double lat; // vĩ độ
+
+    @Column(name = "lng")
+    private Double lng; // kinh độ
 
     private String phone;
 

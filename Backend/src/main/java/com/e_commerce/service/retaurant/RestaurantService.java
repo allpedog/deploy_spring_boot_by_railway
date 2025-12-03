@@ -1,7 +1,7 @@
 package com.e_commerce.service.retaurant;
 
+import com.e_commerce.dto.order.orderDTO.OrderDTO;
 import com.e_commerce.entity.Restaurant;
-import com.e_commerce.entity.order.Orders;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public interface RestaurantService {
 
     void delete(Integer id);
 
-    List<Orders> getOrders(Integer restaurantId);
+    List<OrderDTO> getOrders(Integer restaurantId);
 }
